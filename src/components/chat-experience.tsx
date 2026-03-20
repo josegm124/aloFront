@@ -84,7 +84,7 @@ const translations = {
     quickPrompts: [
       "Pintura para casa",
       "Vinil-Acrilica Premium",
-      "Impermeabilizante 10 anos",
+      "Impermeabilizante 10 años",
       "Pintura para herreria",
       "Promociones recientes",
     ],
