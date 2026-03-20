@@ -380,6 +380,7 @@ export function ChatExperience() {
         body: JSON.stringify({
           prompt: cleanPrompt,
           page: window.location.pathname,
+          language,
         }),
       });
 

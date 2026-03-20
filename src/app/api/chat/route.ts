@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       },
       context: {
         source: "vercel-web",
-        locale: request.headers.get("accept-language")?.split(",")[0] ?? "es-MX",
+        locale: payload.language === "en" ? "en-US" : "es-MX",
         client: {
           app: "alofront",
           version: "0.1.0",

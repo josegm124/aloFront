@@ -24,6 +24,7 @@ export type MessageStatusResponse = {
 export type SendChatPayload = {
   prompt: string;
   page?: string;
+  language?: "es" | "en";
 };
 
 export type SendChatResult = AcceptedMessageResponse & {
