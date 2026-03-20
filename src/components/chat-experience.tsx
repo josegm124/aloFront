@@ -300,6 +300,37 @@ export function ChatExperience() {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
   }, [language, languageReady]);
 
+  useEffect(() => {
+    if (!languageReady) {
+      return;
+    }
+
+    setMessages((current) => {
+      let changed = false;
+
+      const next = current.map((message) => {
+        if (message.id === "welcome" && message.role === "assistant" && profile.name) {
+          const updatedContent = greetingFor(profile.name, strings);
+          if (updatedContent !== message.content) {
+            changed = true;
+            return { ...message, content: updatedContent };
+          }
+        }
+
+        if (message.role === "assistant" && message.status === "pending") {
+          if (message.content !== strings.pendingMessage) {
+            changed = true;
+            return { ...message, content: strings.pendingMessage };
+          }
+        }
+
+        return message;
+      });
+
+      return changed ? next : current;
+    });
+  }, [language, languageReady, profile.name, strings]);
+
   const handleOnboardingSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -444,32 +475,6 @@ export function ChatExperience() {
       <main className="chat-stage">
         <section className="chat-surface">
           <header className="chat-header">
-            <div className="chat-title">
-              <button
-                type="button"
-                className="sidebar-toggle"
-                onClick={handleSidebarToggle}
-                aria-label={sidebarToggleLabel}
-                aria-expanded={sidebarVisible}
-                aria-controls="sidebar"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                  <path
-                    d="M9 6l6 6-6 6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-              <div>
-                <p className="eyebrow">{strings.appName}</p>
-                <h1>{strings.headerTitle}</h1>
-                <p className="header-status">{statusLabel}</p>
-              </div>
-            </div>
             <div className="header-actions">
               <div className="language-switcher" role="group" aria-label={strings.aria.language}>
                 <button
@@ -492,6 +497,67 @@ export function ChatExperience() {
               <div className="profile-chip">
                 <span>{profile.name || strings.profileFallbackName}</span>
                 <small>{profile.email || strings.profileFallbackEmail}</small>
+              </div>
+            </div>
+            <div className="chat-title">
+              <button
+                type="button"
+                className="sidebar-toggle"
+                onClick={handleSidebarToggle}
+                aria-label={sidebarToggleLabel}
+                aria-expanded={sidebarVisible}
+                aria-controls="sidebar"
+              >
+                {isMobile ? (
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    {sidebarOpen ? (
+                      <path
+                        d="M7 7l10 10M17 7L7 17"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    ) : (
+                      <>
+                        <rect
+                          x="3.5"
+                          y="5"
+                          width="17"
+                          height="14"
+                          rx="2.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                        />
+                        <path
+                          d="M14.5 6v12"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </>
+                    )}
+                  </svg>
+                ) : (
+                  <svg className="desktop-toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="M9 6l6 6-6 6"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </button>
+              <div>
+                <p className="eyebrow">{strings.appName}</p>
+                <h1>{strings.headerTitle}</h1>
+                <p className="header-status">{statusLabel}</p>
               </div>
             </div>
           </header>
