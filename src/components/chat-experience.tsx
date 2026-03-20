@@ -146,7 +146,7 @@ const translations = {
   },
 } as const;
 
-type Strings = (typeof translations)["es"];
+type Strings = (typeof translations)[Language];
 
 function readCookie(name: string) {
   if (typeof document === "undefined") {
