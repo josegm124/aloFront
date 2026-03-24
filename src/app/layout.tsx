@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ALO Compliance Portal",
-  description: "Landing y flujo de assessment documental para el backend de compliance de ALO.",
+  title: "ALO Compliance | AI Assessment Portal",
+  description: "Portal MVP para registrar evaluaciones, cargar documentacion de IA y obtener una revision documental inicial.",
 };
 
 export default function RootLayout({
