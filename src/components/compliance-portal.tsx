@@ -101,6 +101,51 @@ type DocumentAnalysisResponse = {
   findings?: AnalysisFinding[];
 };
 
+type ReportSection = {
+  title: string;
+  summary: string;
+  items: string[];
+};
+
+type GeneratedAssessmentReport = {
+  reportId: string;
+  assessmentId: string;
+  preferredLanguage: PreferredLanguage;
+  generatedAt: string;
+  webReport: {
+    title: string;
+    subtitle: string;
+    htmlContent: string;
+    sections: ReportSection[];
+  };
+  pdfReportArtifact: {
+    fileName: string;
+    contentType: string;
+    sizeBytes: number;
+    base64Content: string;
+  };
+};
+
+type PublishedReportResponse = {
+  generatedAssessmentReport: GeneratedAssessmentReport;
+  reportAccessUrl: string;
+  pdfDownloadUrl: string;
+};
+
+type NotificationResponse = {
+  notificationId: string;
+  assessmentId: string;
+  tenantId: string;
+  channel: string;
+  recipients: string[];
+  subject: string;
+  body: string;
+  reportAccessUrl: string;
+  deliveryStatus: string;
+  providerMessageId?: string | null;
+  generatedAt: string;
+};
+
 type PayloadPreview = {
   tenantId: string;
   organizationId: string;
@@ -517,6 +562,8 @@ export function CompliancePortal() {
   const [submitting, setSubmitting] = useState(false);
   const [assessmentResponse, setAssessmentResponse] = useState<AssessmentResponse | null>(null);
   const [analysisResponse, setAnalysisResponse] = useState<DocumentAnalysisResponse | null>(null);
+  const [publishedReport, setPublishedReport] = useState<PublishedReportResponse | null>(null);
+  const [notificationResponse, setNotificationResponse] = useState<NotificationResponse | null>(null);
   const [payloadPreview, setPayloadPreview] = useState<PayloadPreview | null>(null);
 
   const t = copy[locale];
@@ -702,6 +749,8 @@ export function CompliancePortal() {
     setSubmitting(true);
     setAssessmentResponse(null);
     setAnalysisResponse(null);
+    setPublishedReport(null);
+    setNotificationResponse(null);
     setPayloadPreview(assessmentPayload);
     setNotice({ tone: "info", text: t.notices.sendingAssessment });
 
@@ -750,7 +799,50 @@ export function CompliancePortal() {
       }
 
       setAnalysisResponse(analysisBody);
-      setNotice({ tone: "success", text: t.notices.success });
+
+      const reportRequest = await fetch("/api/report/finalize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          assessment: assessmentBody.assessment,
+          documentAnalysisResult: analysisBody,
+          recipients: [assessmentPayload.userId],
+        }),
+      });
+
+      const reportBody = (await reportRequest.json()) as PublishedReportResponse & { error?: string };
+      if (!reportRequest.ok) {
+        throw new Error(reportBody.error ?? "The final report could not be generated.");
+      }
+      setPublishedReport(reportBody);
+
+      const notificationRequest = await fetch("/api/notification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          generatedAssessmentReport: reportBody.generatedAssessmentReport,
+          tenantId: assessmentPayload.tenantId,
+          recipients: [assessmentPayload.userId],
+          reportAccessUrl: reportBody.reportAccessUrl,
+        }),
+      });
+
+      const notificationBody = (await notificationRequest.json()) as NotificationResponse & { error?: string };
+      if (!notificationRequest.ok) {
+        throw new Error(notificationBody.error ?? "The notification email could not be generated.");
+      }
+      setNotificationResponse(notificationBody);
+      setNotice({
+        tone: "success",
+        text:
+          locale === "es"
+            ? `Evaluacion completada. Reporte ${reportBody.generatedAssessmentReport.reportId} listo y correo ${notificationBody.deliveryStatus.toLowerCase()}.`
+            : `Assessment completed. Report ${reportBody.generatedAssessmentReport.reportId} is ready and email status is ${notificationBody.deliveryStatus.toLowerCase()}.`,
+      });
     } catch (error) {
       setNotice({
         tone: "error",
@@ -1365,6 +1457,65 @@ export function CompliancePortal() {
                       </article>
                     ))}
                   </div>
+                </article>
+              ) : null}
+
+              {publishedReport ? (
+                <article className={styles.sideCard}>
+                  <p className={styles.sideLabel}>{locale === "es" ? "Reporte final" : "Final report"}</p>
+                  <div className={styles.metaList}>
+                    <div>
+                      <span>reportId</span>
+                      <strong>{publishedReport.generatedAssessmentReport.reportId}</strong>
+                    </div>
+                    <div>
+                      <span>generatedAt</span>
+                      <strong>
+                        {formatDate(
+                          publishedReport.generatedAssessmentReport.generatedAt,
+                          locale,
+                          t.pending,
+                        )}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>{locale === "es" ? "Correo" : "Email"}</span>
+                      <strong>{notificationResponse?.deliveryStatus ?? t.pending}</strong>
+                    </div>
+                  </div>
+
+                  <div className={styles.formActions}>
+                    <a className={styles.primaryButton} href={publishedReport.reportAccessUrl} rel="noreferrer" target="_blank">
+                      {locale === "es" ? "Ver reporte web" : "Open web report"}
+                    </a>
+                    <a className={styles.ghostButton} href={publishedReport.pdfDownloadUrl} rel="noreferrer" target="_blank">
+                      {locale === "es" ? "Descargar PDF" : "Download PDF"}
+                    </a>
+                  </div>
+
+                  <div className={styles.findings}>
+                    {publishedReport.generatedAssessmentReport.webReport.sections.map((section) => (
+                      <article className={styles.findingCard} key={section.title}>
+                        <div className={styles.findingMeta}>
+                          <strong>{section.title}</strong>
+                          <span>{section.items.length}</span>
+                        </div>
+                        <p>{section.summary}</p>
+                        <ul className={styles.sideList}>
+                          {section.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </article>
+                    ))}
+                  </div>
+
+                  {notificationResponse ? (
+                    <details className={styles.details}>
+                      <summary>{locale === "es" ? "Detalle del correo" : "Email detail"}</summary>
+                      <pre>{JSON.stringify(notificationResponse, null, 2)}</pre>
+                    </details>
+                  ) : null}
                 </article>
               ) : null}
 
