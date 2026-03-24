@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AloChat Front",
-  description: "Interfaz inicial de AloChat para Vercel.",
+  title: "ALO Compliance Portal",
+  description: "Landing y flujo de assessment documental para el backend de compliance de ALO.",
 };
 
 export default function RootLayout({
