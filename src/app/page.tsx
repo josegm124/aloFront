@@ -1,5 +1,5 @@
-import { ChatExperience } from "@/components/chat-experience";
+import { CompliancePortal } from "@/components/compliance-portal";
 
 export default function Home() {
-  return <ChatExperience />;
+  return <CompliancePortal />;
 }
