@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildSignedJsonHeaders, getComplianceApiBaseUrl } from "@/lib/upstream-signing";
 
-function buildMockAssessment(payload: Record<string, unknown>) {
+function buildAssistedAssessment(payload: Record<string, unknown>) {
   const now = new Date().toISOString();
   const artifacts = Array.isArray(payload.artifacts)
     ? payload.artifacts.map((artifact: Record<string, unknown>) => ({
@@ -28,7 +28,7 @@ function buildMockAssessment(payload: Record<string, unknown>) {
       idempotencyKey: crypto.randomUUID(),
       regulatoryProfileId,
       status: "RECEIVED",
-      backendMode: "mock",
+      backendMode: "assisted",
       assessment: {
         ...payload,
         regulatoryProfileId,
@@ -78,16 +78,16 @@ export async function POST(request: Request) {
         });
       }
     } catch {
-      // fall through to mock response
+      // fall through to assisted response
     }
   }
 
-  const mockResponse = buildMockAssessment(payload);
-  mockResponse.headers.set(
+  const assistedResponse = buildAssistedAssessment(payload);
+  assistedResponse.headers.set(
     "x-alo-warning",
     preferredLanguage === "EN"
-      ? "Assessment backend unavailable, mock response returned."
-      : "Backend de assessment no disponible, se devolvio respuesta mock.",
+      ? "Assessment service temporarily unavailable, assisted response returned."
+      : "El servicio de evaluacion no esta disponible temporalmente; se devolvio una respuesta asistida.",
   );
-  return mockResponse;
+  return assistedResponse;
 }
