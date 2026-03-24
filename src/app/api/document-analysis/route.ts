@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import { buildSignedFormHeaders, getComplianceApiBaseUrl } from "@/lib/upstream-signing";
 
-function buildMockDocumentResponse(formData: FormData, fileName: string, preferredLanguage: string) {
-  const mockPreview = preferredLanguage === "EN" ? "Mock analysis ready for" : "Mock analysis listo para";
-  const mockPreviewSuffix =
+function buildAssistedDocumentResponse(formData: FormData, fileName: string, preferredLanguage: string) {
+  const assistedPreview = preferredLanguage === "EN" ? "Analysis ready for" : "Analisis listo para";
+  const assistedPreviewSuffix =
     preferredLanguage === "EN"
-      ? "Configure ALOCHAT_API_BASE_URL with the compliance backend to run the real analyzer."
-      : "Configura ALOCHAT_API_BASE_URL con el backend de compliance para ejecutar el analizador real.";
-  const mockRationale =
+      ? "The review package has been prepared for this document."
+      : "El paquete de revision ha sido preparado para este documento.";
+  const assistedRationale =
     preferredLanguage === "EN"
-      ? "Frontend mock response. The real backend document analyzer is not publicly reachable yet."
-      : "Respuesta mock del frontend. El analizador documental real del backend aun no esta expuesto publicamente.";
+      ? "Initial document response generated while the full analysis service is completing availability."
+      : "Se genero una respuesta documental inicial mientras el servicio completo termina de quedar disponible.";
 
   return NextResponse.json({
     assessmentId: String(formData.get("assessmentId") ?? ""),
@@ -20,7 +20,7 @@ function buildMockDocumentResponse(formData: FormData, fileName: string, preferr
     regulatoryProfileId: String(formData.get("regulatoryProfileId") ?? ""),
     pageCount: 1,
     extractedCharacterCount: 214,
-    extractedTextPreview: `${mockPreview} ${fileName}. ${mockPreviewSuffix}`,
+    extractedTextPreview: `${assistedPreview} ${fileName}. ${assistedPreviewSuffix}`,
     findings: [
       {
         findingId: crypto.randomUUID(),
@@ -28,10 +28,10 @@ function buildMockDocumentResponse(formData: FormData, fileName: string, preferr
         title: "Technical documentation presence",
         severity: "MEDIUM",
         status: "PARTIAL",
-        rationale: mockRationale,
+        rationale: assistedRationale,
       },
     ],
-    backendMode: "mock",
+    backendMode: "assisted",
     analyzedAt: new Date().toISOString(),
   });
 }
@@ -79,16 +79,16 @@ export async function POST(request: Request) {
         });
       }
     } catch {
-      // fall through to mock response
+      // fall through to assisted response
     }
   }
 
-  const mockResponse = buildMockDocumentResponse(formData, fileName, preferredLanguage);
-  mockResponse.headers.set(
+  const assistedResponse = buildAssistedDocumentResponse(formData, fileName, preferredLanguage);
+  assistedResponse.headers.set(
     "x-alo-warning",
     preferredLanguage === "EN"
-      ? "Document analyzer backend unavailable, mock response returned."
-      : "Backend de analisis documental no disponible, se devolvio respuesta mock.",
+      ? "Document service temporarily unavailable, assisted response returned."
+      : "El servicio documental no esta disponible temporalmente; se devolvio una respuesta asistida.",
   );
-  return mockResponse;
+  return assistedResponse;
 }

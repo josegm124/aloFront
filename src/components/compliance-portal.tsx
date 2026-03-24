@@ -139,10 +139,10 @@ const copy = {
     navSignup: "Crear cuenta",
     langEs: "ES",
     langEn: "EN",
-    landingEyebrow: "MVP operativo",
+    landingEyebrow: "Evaluacion digital",
     landingTitle: "Evalua documentacion de sistemas de IA y detecta brechas regulatorias desde una sola vista.",
     landingLead:
-      "Este MVP permite registrar evaluaciones, cargar el PDF principal y obtener una primera revision documental orientada a EU AI Act y GDPR para Healthcare y HR.",
+      "La plataforma permite registrar evaluaciones, cargar el PDF principal y obtener una primera revision documental orientada a EU AI Act y GDPR para Healthcare y HR.",
     landingPrimaryCta: "Iniciar evaluacion",
     landingSecondaryCta: "Crear cuenta",
     metricAssessmentTitle: "Evaluacion guiada",
@@ -151,7 +151,7 @@ const copy = {
     metricDocumentText: "Carga el PDF principal y dispara el analisis inicial de documentacion tecnica y evidencia disponible.",
     metricProfileTitle: "Cobertura inicial",
     metricProfileText: "El flujo prepara la evaluacion para casos de Healthcare y HR con señales de privacidad, riesgo y supervision humana.",
-    sideWhatTitle: "Lo que puedes hacer en este MVP",
+    sideWhatTitle: "Lo que puedes hacer en la plataforma",
     sideWhatItems: [
       "Crear una cuenta y acceder al portal desde la misma interfaz.",
       "Registrar una nueva evaluacion con contexto de negocio y regulacion.",
@@ -246,10 +246,10 @@ const copy = {
     navSignup: "Create account",
     langEs: "ES",
     langEn: "EN",
-    landingEyebrow: "Operational MVP",
+    landingEyebrow: "Digital assessment",
     landingTitle: "Evaluate AI system documentation and detect regulatory gaps from a single workspace.",
     landingLead:
-      "This MVP lets teams register assessments, upload the main PDF, and obtain an initial documentary review aligned with the EU AI Act and GDPR for Healthcare and HR.",
+      "The platform lets teams register assessments, upload the main PDF, and obtain an initial documentary review aligned with the EU AI Act and GDPR for Healthcare and HR.",
     landingPrimaryCta: "Start assessment",
     landingSecondaryCta: "Create account",
     metricAssessmentTitle: "Guided assessment",
@@ -258,7 +258,7 @@ const copy = {
     metricDocumentText: "Uploads the main PDF and triggers the initial analysis of technical documentation and available evidence.",
     metricProfileTitle: "Initial coverage",
     metricProfileText: "The flow prepares the review for Healthcare and HR with privacy, risk, and human oversight signals.",
-    sideWhatTitle: "What you can do in this MVP",
+    sideWhatTitle: "What you can do in the platform",
     sideWhatItems: [
       "Create an account and access the portal from the same interface.",
       "Register a new assessment with business and regulatory context.",
@@ -851,7 +851,7 @@ export function CompliancePortal() {
 
               <div className={styles.infoPanel}>
                 <span>{t.backendTarget}</span>
-                <strong>`aloChat` / `feature/romeBS`</strong>
+                <strong>ALO Compliance Platform</strong>
                 <p>{t.backendInfo}</p>
               </div>
             </aside>
