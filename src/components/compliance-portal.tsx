@@ -243,7 +243,11 @@ const copy = {
     documentSectionTitle: "Documento principal del sistema",
     documentSectionText: "Carga el PDF obligatorio que describe el sistema, su uso y su documentacion tecnica disponible.",
     extraAnswersLabel: "intakeAnswers extra",
+    extraAnswersHelp:
+      "Datos adicionales en formato clave=valor. Se agregan al payload para enriquecer el contexto regulatorio y operativo.",
     healthcareProfileLabel: "healthcareAuditProfile opcional",
+    healthcareProfileHelp:
+      "Bloque JSON opcional para ampliar el perfil clinico o sectorial. Solo usalo si tienes informacion estructurada valida.",
     healthcareProfilePlaceholder: '{"purpose":{"summary":"Clinical triage"}}',
     uploadLabel: "Archivo PDF",
     uploadHelp: "El portal completa la metadata basica del archivo al momento de seleccionarlo.",
@@ -291,6 +295,10 @@ const copy = {
     s3KeyLabel: "Ruta del archivo en storage",
     s3KeyPlaceholder: "uploads/main-document.pdf",
     checksumLabel: "Checksum del archivo",
+    checksumHelp:
+      "Huella opcional del PDF para trazabilidad e integridad. Si no la tienes, el flujo puede continuar sin este dato.",
+    metadataHelp:
+      "Metadata adicional del artifact en formato clave=valor. Sirve para ownership, stage, origen u otras marcas operativas.",
     notices: {
       invalidLogin: "Completa correo y password para continuar.",
       frontendLoginReady:
@@ -379,7 +387,11 @@ const copy = {
     documentSectionTitle: "Main system document",
     documentSectionText: "Upload the mandatory PDF describing the system, its use, and the technical documentation currently available.",
     extraAnswersLabel: "extra intakeAnswers",
+    extraAnswersHelp:
+      "Additional key=value inputs appended to the payload to enrich regulatory and operational context.",
     healthcareProfileLabel: "optional healthcareAuditProfile",
+    healthcareProfileHelp:
+      "Optional JSON block to extend the clinical or sector profile. Use it only when you have valid structured data.",
     healthcareProfilePlaceholder: '{"purpose":{"summary":"Clinical triage"}}',
     uploadLabel: "PDF file",
     uploadHelp: "The portal fills the basic file metadata when you select the document.",
@@ -427,6 +439,10 @@ const copy = {
     s3KeyLabel: "Storage file path",
     s3KeyPlaceholder: "uploads/main-document.pdf",
     checksumLabel: "File checksum",
+    checksumHelp:
+      "Optional PDF fingerprint for traceability and integrity. The flow can continue without it if unavailable.",
+    metadataHelp:
+      "Additional artifact metadata in key=value format. Useful for ownership, stage, source, or other operational markers.",
     notices: {
       invalidLogin: "Enter both email and password to continue.",
       frontendLoginReady:
@@ -618,6 +634,14 @@ function resolveNoticeText(localeCopy: (typeof copy)[Locale], notice: Notice | n
     return localeCopy.notices[notice.key];
   }
   return notice.text ?? "";
+}
+
+function renderInfoLabel(label: string, help: string) {
+  return (
+    <span title={help} style={{ cursor: "help" }}>
+      {label}
+    </span>
+  );
 }
 
 export function CompliancePortal() {
@@ -1341,7 +1365,7 @@ export function CompliancePortal() {
 
                 <div className={styles.formStack}>
                   <label className={styles.field}>
-                    <span>{t.extraAnswersLabel}</span>
+                    {renderInfoLabel(`${t.extraAnswersLabel} *`, t.extraAnswersHelp)}
                     <textarea
                       rows={4}
                       value={assessmentForm.extraIntakeAnswersText}
@@ -1351,7 +1375,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.healthcareProfileLabel}</span>
+                    {renderInfoLabel(`${t.healthcareProfileLabel} *`, t.healthcareProfileHelp)}
                     <textarea
                       rows={5}
                       value={assessmentForm.healthcareAuditProfileJson}
@@ -1429,7 +1453,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.checksumLabel}</span>
+                    {renderInfoLabel(`${t.checksumLabel} *`, t.checksumHelp)}
                     <input
                       type="text"
                       value={assessmentForm.checksum}
@@ -1440,7 +1464,7 @@ export function CompliancePortal() {
                 </div>
 
                 <label className={styles.field}>
-                  <span>{t.metadataLabel}</span>
+                  {renderInfoLabel(`${t.metadataLabel} *`, t.metadataHelp)}
                   <textarea
                     rows={4}
                     value={assessmentForm.artifactMetadataText}
