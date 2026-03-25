@@ -13,7 +13,8 @@ type NoticeTone = "info" | "success" | "error";
 
 type Notice = {
   tone: NoticeTone;
-  text: string;
+  key?: keyof (typeof copy)["es"]["notices"];
+  text?: string;
 };
 
 type LoginFormState = {
@@ -249,6 +250,8 @@ const copy = {
     noFile: "Sin archivo",
     checksumPlaceholder: "Opcional",
     metadataLabel: "artifact metadata",
+    metadataPlaceholder: "owner=compliance-team\nreviewStage=intake",
+    extraAnswersPlaceholder: "riskCommitteeAssigned=true\nhumanReviewOwner=clinical-lead",
     sending: "Enviando...",
     assessmentSubmit: "Enviar evaluacion y analizar documento",
     backToLogin: "Volver al login",
@@ -261,6 +264,33 @@ const copy = {
     pending: "Pendiente",
     payloadPreview: "Resumen tecnico enviado",
     viewSentJson: "Ver detalle tecnico",
+    tenantIdLabel: "Tenant ID",
+    organizationIdLabel: "Organization ID",
+    userIdLabel: "User ID",
+    preferredLanguageLabel: "Idioma preferido *",
+    sectorLabel: "Sector *",
+    geographyLabel: "Geografia / pais operativo *",
+    geographyPlaceholder: "Mexico",
+    useCaseTypeLabel: "Tipo de caso de uso *",
+    useCaseTypePlaceholder: "Soporte a decision clinica",
+    aiSystemCategoryLabel: "Categoria del sistema de IA *",
+    aiSystemCategoryPlaceholder: "IA medica de alto riesgo",
+    systemNameLabel: "Nombre del sistema *",
+    systemNamePlaceholder: "CertifAI Triage Review",
+    systemVersionLabel: "Version del sistema *",
+    systemVersionPlaceholder: "1.0.0",
+    providerLabel: "Proveedor / owner del sistema",
+    providerPlaceholder: "Alo Health",
+    deploymentContextLabel: "Contexto de despliegue *",
+    deploymentContextPlaceholder: "Private cloud hospital deployment",
+    usesPersonalDataLabel: "Usa datos personales",
+    usesSensitiveDataLabel: "Usa datos sensibles",
+    humanOversightLabel: "Tiene supervision humana",
+    datasetProvidedLabel: "Incluye dataset opcional",
+    s3BucketLabel: "Bucket de carga",
+    s3KeyLabel: "Ruta del archivo en storage",
+    s3KeyPlaceholder: "uploads/main-document.pdf",
+    checksumLabel: "Checksum del archivo",
     notices: {
       invalidLogin: "Completa correo y password para continuar.",
       frontendLoginReady:
@@ -356,6 +386,8 @@ const copy = {
     noFile: "No file selected",
     checksumPlaceholder: "Optional",
     metadataLabel: "artifact metadata",
+    metadataPlaceholder: "owner=compliance-team\nreviewStage=intake",
+    extraAnswersPlaceholder: "riskCommitteeAssigned=true\nhumanReviewOwner=clinical-lead",
     sending: "Sending...",
     assessmentSubmit: "Submit assessment and analyze document",
     backToLogin: "Back to login",
@@ -368,6 +400,33 @@ const copy = {
     pending: "Pending",
     payloadPreview: "Technical payload summary",
     viewSentJson: "View technical detail",
+    tenantIdLabel: "Tenant ID",
+    organizationIdLabel: "Organization ID",
+    userIdLabel: "User ID",
+    preferredLanguageLabel: "Preferred language *",
+    sectorLabel: "Sector *",
+    geographyLabel: "Operating geography / country *",
+    geographyPlaceholder: "Mexico",
+    useCaseTypeLabel: "Use case type *",
+    useCaseTypePlaceholder: "Clinical decision support",
+    aiSystemCategoryLabel: "AI system category *",
+    aiSystemCategoryPlaceholder: "High-risk medical AI",
+    systemNameLabel: "System name *",
+    systemNamePlaceholder: "CertifAI Triage Review",
+    systemVersionLabel: "System version *",
+    systemVersionPlaceholder: "1.0.0",
+    providerLabel: "System provider / owner",
+    providerPlaceholder: "Alo Health",
+    deploymentContextLabel: "Deployment context *",
+    deploymentContextPlaceholder: "Private cloud hospital deployment",
+    usesPersonalDataLabel: "Uses personal data",
+    usesSensitiveDataLabel: "Uses sensitive data",
+    humanOversightLabel: "Has human oversight",
+    datasetProvidedLabel: "Includes optional dataset",
+    s3BucketLabel: "Upload bucket",
+    s3KeyLabel: "Storage file path",
+    s3KeyPlaceholder: "uploads/main-document.pdf",
+    checksumLabel: "File checksum",
     notices: {
       invalidLogin: "Enter both email and password to continue.",
       frontendLoginReady:
@@ -421,22 +480,22 @@ const defaultAssessmentForm: AssessmentFormState = {
   userId: "",
   preferredLanguage: "ES",
   sector: "HEALTHCARE",
-  useCaseType: "Clinical decision support",
-  aiSystemCategory: "High risk medical AI",
-  geography: "Mexico",
+  useCaseType: "",
+  aiSystemCategory: "",
+  geography: "",
   datasetProvided: false,
-  systemName: "Alo Compliance Review",
-  systemVersion: "1.0.0",
+  systemName: "",
+  systemVersion: "",
   provider: "Alo",
-  deploymentContext: "Private cloud",
+  deploymentContext: "",
   usesPersonalData: true,
   usesSensitiveData: true,
   humanOversight: true,
   s3Bucket: "alo-intake-dev",
   s3Key: "",
   checksum: "",
-  artifactMetadataText: "channel=landing\nowner=compliance-team",
-  extraIntakeAnswersText: "organizationReadiness=medium\nriskCommitteeAssigned=true",
+  artifactMetadataText: "",
+  extraIntakeAnswersText: "",
   healthcareAuditProfileJson: "",
 };
 
@@ -551,6 +610,16 @@ function formatDate(value: string | undefined, locale: Locale, pending: string) 
   }).format(date);
 }
 
+function resolveNoticeText(localeCopy: (typeof copy)[Locale], notice: Notice | null) {
+  if (!notice) {
+    return "";
+  }
+  if (notice.key) {
+    return localeCopy.notices[notice.key];
+  }
+  return notice.text ?? "";
+}
+
 export function CompliancePortal() {
   const [locale, setLocale] = useState<Locale>("es");
   const [activeView, setActiveView] = useState<View>("landing");
@@ -607,7 +676,7 @@ export function CompliancePortal() {
     const email = loginForm.email.trim().toLowerCase();
     const password = loginForm.password.trim();
     if (!email || !password) {
-      setNotice({ tone: "error", text: t.notices.invalidLogin });
+      setNotice({ tone: "error", key: "invalidLogin" });
       return;
     }
 
@@ -615,7 +684,7 @@ export function CompliancePortal() {
       (candidate) => candidate.email === email && candidate.password === password,
     );
     if (!account) {
-      setNotice({ tone: "error", text: t.notices.invalidCredentials });
+      setNotice({ tone: "error", key: "invalidCredentials" });
       return;
     }
 
@@ -630,7 +699,7 @@ export function CompliancePortal() {
       provider: account.company,
     }));
     setActiveView("assessment");
-    setNotice({ tone: "success", text: t.notices.frontendLoginReady });
+    setNotice({ tone: "success", key: "frontendLoginReady" });
   }
 
   function handleSignup(event: FormEvent<HTMLFormElement>) {
@@ -642,18 +711,18 @@ export function CompliancePortal() {
     const password = signupForm.password.trim();
 
     if (!fullName || !company || !email || !password) {
-      setNotice({ tone: "error", text: t.notices.missingSignup });
+      setNotice({ tone: "error", key: "missingSignup" });
       return;
     }
 
     if (signupForm.password !== signupForm.confirmPassword) {
-      setNotice({ tone: "error", text: t.notices.passwordMismatch });
+      setNotice({ tone: "error", key: "passwordMismatch" });
       return;
     }
 
     const existingAccounts = readStoredAccounts();
     if (existingAccounts.some((account) => account.email === email)) {
-      setNotice({ tone: "error", text: t.notices.accountExists });
+      setNotice({ tone: "error", key: "accountExists" });
       return;
     }
 
@@ -676,19 +745,19 @@ export function CompliancePortal() {
       provider: company,
     }));
     setActiveView("login");
-    setNotice({ tone: "success", text: t.notices.accountReady });
+    setNotice({ tone: "success", key: "accountReady" });
   }
 
   async function handleAssessmentSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!selectedFile) {
-      setNotice({ tone: "error", text: t.notices.missingFile });
+      setNotice({ tone: "error", key: "missingFile" });
       return;
     }
 
     if (assessmentForm.datasetProvided) {
-      setNotice({ tone: "error", text: t.notices.datasetUnsupported });
+      setNotice({ tone: "error", key: "datasetUnsupported" });
       return;
     }
 
@@ -697,7 +766,7 @@ export function CompliancePortal() {
       try {
         healthcareAuditProfile = JSON.parse(assessmentForm.healthcareAuditProfileJson);
       } catch {
-        setNotice({ tone: "error", text: t.notices.invalidHealthcareProfile });
+        setNotice({ tone: "error", key: "invalidHealthcareProfile" });
         return;
       }
     }
@@ -752,7 +821,7 @@ export function CompliancePortal() {
     setPublishedReport(null);
     setNotificationResponse(null);
     setPayloadPreview(assessmentPayload);
-    setNotice({ tone: "info", text: t.notices.sendingAssessment });
+    setNotice({ tone: "info", key: "sendingAssessment" });
 
     try {
       const assessmentRequest = await fetch("/api/assessment", {
@@ -898,7 +967,7 @@ export function CompliancePortal() {
         </header>
 
         {notice ? (
-          <div className={`${styles.notice} ${styles[`notice${notice.tone}`]}`}>{notice.text}</div>
+          <div className={`${styles.notice} ${styles[`notice${notice.tone}`]}`}>{resolveNoticeText(t, notice)}</div>
         ) : null}
 
         {activeView === "landing" ? (
@@ -1096,34 +1165,34 @@ export function CompliancePortal() {
 
                 <div className={styles.formGrid}>
                   <label className={styles.field}>
-                    <span>tenantId</span>
+                    <span>{t.tenantIdLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.tenantId}
-                      onChange={(event) => updateAssessment("tenantId", event.target.value)}
+                      readOnly
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>organizationId</span>
+                    <span>{t.organizationIdLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.organizationId}
-                      onChange={(event) => updateAssessment("organizationId", event.target.value)}
+                      readOnly
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>userId</span>
+                    <span>{t.userIdLabel}</span>
                     <input
-                      type="text"
+                      type="email"
                       value={assessmentForm.userId}
-                      onChange={(event) => updateAssessment("userId", event.target.value)}
+                      readOnly
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>preferredLanguage</span>
+                    <span>{t.preferredLanguageLabel}</span>
                     <select
                       value={assessmentForm.preferredLanguage}
                       onChange={(event) =>
@@ -1139,7 +1208,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>sector</span>
+                    <span>{t.sectorLabel}</span>
                     <select
                       value={assessmentForm.sector}
                       onChange={(event) => updateAssessment("sector", event.target.value as Sector)}
@@ -1153,29 +1222,32 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>geography</span>
+                    <span>{t.geographyLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.geography}
                       onChange={(event) => updateAssessment("geography", event.target.value)}
+                      placeholder={t.geographyPlaceholder}
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>useCaseType</span>
+                    <span>{t.useCaseTypeLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.useCaseType}
                       onChange={(event) => updateAssessment("useCaseType", event.target.value)}
+                      placeholder={t.useCaseTypePlaceholder}
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>aiSystemCategory</span>
+                    <span>{t.aiSystemCategoryLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.aiSystemCategory}
                       onChange={(event) => updateAssessment("aiSystemCategory", event.target.value)}
+                      placeholder={t.aiSystemCategoryPlaceholder}
                     />
                   </label>
                 </div>
@@ -1189,38 +1261,42 @@ export function CompliancePortal() {
 
                 <div className={styles.formGrid}>
                   <label className={styles.field}>
-                    <span>systemName</span>
+                    <span>{t.systemNameLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.systemName}
                       onChange={(event) => updateAssessment("systemName", event.target.value)}
+                      placeholder={t.systemNamePlaceholder}
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>systemVersion</span>
+                    <span>{t.systemVersionLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.systemVersion}
                       onChange={(event) => updateAssessment("systemVersion", event.target.value)}
+                      placeholder={t.systemVersionPlaceholder}
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>provider</span>
+                    <span>{t.providerLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.provider}
-                      onChange={(event) => updateAssessment("provider", event.target.value)}
+                      readOnly
+                      placeholder={t.providerPlaceholder}
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>deploymentContext</span>
+                    <span>{t.deploymentContextLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.deploymentContext}
                       onChange={(event) => updateAssessment("deploymentContext", event.target.value)}
+                      placeholder={t.deploymentContextPlaceholder}
                     />
                   </label>
                 </div>
@@ -1232,7 +1308,7 @@ export function CompliancePortal() {
                       onChange={(event) => updateAssessment("usesPersonalData", event.target.checked)}
                       type="checkbox"
                     />
-                    <span>usesPersonalData</span>
+                    <span>{t.usesPersonalDataLabel}</span>
                   </label>
 
                   <label className={styles.toggle}>
@@ -1241,7 +1317,7 @@ export function CompliancePortal() {
                       onChange={(event) => updateAssessment("usesSensitiveData", event.target.checked)}
                       type="checkbox"
                     />
-                    <span>usesSensitiveData</span>
+                    <span>{t.usesSensitiveDataLabel}</span>
                   </label>
 
                   <label className={styles.toggle}>
@@ -1250,7 +1326,7 @@ export function CompliancePortal() {
                       onChange={(event) => updateAssessment("humanOversight", event.target.checked)}
                       type="checkbox"
                     />
-                    <span>humanOversight</span>
+                    <span>{t.humanOversightLabel}</span>
                   </label>
 
                   <label className={styles.toggle}>
@@ -1259,7 +1335,7 @@ export function CompliancePortal() {
                       onChange={(event) => updateAssessment("datasetProvided", event.target.checked)}
                       type="checkbox"
                     />
-                    <span>datasetProvided</span>
+                    <span>{t.datasetProvidedLabel}</span>
                   </label>
                 </div>
 
@@ -1270,7 +1346,7 @@ export function CompliancePortal() {
                       rows={4}
                       value={assessmentForm.extraIntakeAnswersText}
                       onChange={(event) => updateAssessment("extraIntakeAnswersText", event.target.value)}
-                      placeholder={"key=value\nanotherKey=value"}
+                      placeholder={t.extraAnswersPlaceholder}
                     />
                   </label>
 
@@ -1334,25 +1410,26 @@ export function CompliancePortal() {
 
                 <div className={styles.formGrid}>
                   <label className={styles.field}>
-                    <span>s3Bucket</span>
+                    <span>{t.s3BucketLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.s3Bucket}
-                      onChange={(event) => updateAssessment("s3Bucket", event.target.value)}
+                      readOnly
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>s3Key</span>
+                    <span>{t.s3KeyLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.s3Key}
                       onChange={(event) => updateAssessment("s3Key", event.target.value)}
+                      placeholder={t.s3KeyPlaceholder}
                     />
                   </label>
 
                   <label className={styles.field}>
-                    <span>checksum</span>
+                    <span>{t.checksumLabel}</span>
                     <input
                       type="text"
                       value={assessmentForm.checksum}
@@ -1368,7 +1445,7 @@ export function CompliancePortal() {
                     rows={4}
                     value={assessmentForm.artifactMetadataText}
                     onChange={(event) => updateAssessment("artifactMetadataText", event.target.value)}
-                    placeholder={"key=value\nteam=compliance"}
+                    placeholder={t.metadataPlaceholder}
                   />
                 </label>
               </div>
