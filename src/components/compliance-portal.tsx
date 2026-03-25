@@ -272,20 +272,38 @@ const copy = {
     organizationIdLabel: "Organization ID",
     userIdLabel: "User ID",
     preferredLanguageLabel: "Idioma preferido *",
+    preferredLanguageHelp:
+      "Idioma base del assessment, del reporte y de las notificaciones generadas por el portal.",
     sectorLabel: "Sector *",
+    sectorHelp:
+      "Sector regulatorio principal del sistema evaluado. Define el perfil inicial y los controles aplicables.",
     geographyLabel: "Geografia / pais operativo *",
+    geographyHelp:
+      "Pais o geografia principal donde opera el sistema. Se usa para contextualizar obligaciones regulatorias.",
     geographyPlaceholder: "Mexico",
     useCaseTypeLabel: "Tipo de caso de uso *",
+    useCaseTypeHelp:
+      "Describe el uso real del sistema de IA. Ejemplo: triage clinico, scoring de candidatos o soporte a decisiones.",
     useCaseTypePlaceholder: "Soporte a decision clinica",
     aiSystemCategoryLabel: "Categoria del sistema de IA *",
+    aiSystemCategoryHelp:
+      "Clasificacion funcional o de riesgo del sistema. Ayuda a ubicar el caso dentro de marcos como EU AI Act.",
     aiSystemCategoryPlaceholder: "IA medica de alto riesgo",
     systemNameLabel: "Nombre del sistema *",
+    systemNameHelp:
+      "Nombre comercial o interno del sistema que sera evaluado en el reporte final.",
     systemNamePlaceholder: "CertifAI Triage Review",
     systemVersionLabel: "Version del sistema *",
+    systemVersionHelp:
+      "Version funcional o release evaluado. Sirve para trazabilidad y comparacion entre iteraciones.",
     systemVersionPlaceholder: "1.0.0",
     providerLabel: "Proveedor / owner del sistema",
+    providerHelp:
+      "Empresa, area interna o tercero responsable del sistema evaluado.",
     providerPlaceholder: "Alo Health",
     deploymentContextLabel: "Contexto de despliegue *",
+    deploymentContextHelp:
+      "Describe donde y como corre el sistema. Ejemplo: SaaS, private cloud, hospital deployment o API externa.",
     deploymentContextPlaceholder: "Private cloud hospital deployment",
     usesPersonalDataLabel: "Usa datos personales",
     usesSensitiveDataLabel: "Usa datos sensibles",
@@ -416,20 +434,38 @@ const copy = {
     organizationIdLabel: "Organization ID",
     userIdLabel: "User ID",
     preferredLanguageLabel: "Preferred language *",
+    preferredLanguageHelp:
+      "Base language used for the assessment, generated report, and notifications.",
     sectorLabel: "Sector *",
+    sectorHelp:
+      "Primary regulatory sector for the system under review. It drives the initial profile and applicable controls.",
     geographyLabel: "Operating geography / country *",
+    geographyHelp:
+      "Primary country or geography where the system operates. Used to contextualize regulatory obligations.",
     geographyPlaceholder: "Mexico",
     useCaseTypeLabel: "Use case type *",
+    useCaseTypeHelp:
+      "Describe the real-world use of the AI system. Example: clinical triage, candidate scoring, or decision support.",
     useCaseTypePlaceholder: "Clinical decision support",
     aiSystemCategoryLabel: "AI system category *",
+    aiSystemCategoryHelp:
+      "Functional or risk classification of the system. Helps place the case within frameworks such as the EU AI Act.",
     aiSystemCategoryPlaceholder: "High-risk medical AI",
     systemNameLabel: "System name *",
+    systemNameHelp:
+      "Commercial or internal name of the system that will appear in the final report.",
     systemNamePlaceholder: "CertifAI Triage Review",
     systemVersionLabel: "System version *",
+    systemVersionHelp:
+      "Functional version or release under review. Used for traceability and comparison across iterations.",
     systemVersionPlaceholder: "1.0.0",
     providerLabel: "System provider / owner",
+    providerHelp:
+      "Company, internal team, or third party responsible for the system under review.",
     providerPlaceholder: "Alo Health",
     deploymentContextLabel: "Deployment context *",
+    deploymentContextHelp:
+      "Describe where and how the system runs. Example: SaaS, private cloud, hospital deployment, or external API.",
     deploymentContextPlaceholder: "Private cloud hospital deployment",
     usesPersonalDataLabel: "Uses personal data",
     usesSensitiveDataLabel: "Uses sensitive data",
@@ -1216,7 +1252,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.preferredLanguageLabel}</span>
+                    {renderInfoLabel(t.preferredLanguageLabel, t.preferredLanguageHelp)}
                     <select
                       value={assessmentForm.preferredLanguage}
                       onChange={(event) =>
@@ -1232,7 +1268,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.sectorLabel}</span>
+                    {renderInfoLabel(t.sectorLabel, t.sectorHelp)}
                     <select
                       value={assessmentForm.sector}
                       onChange={(event) => updateAssessment("sector", event.target.value as Sector)}
@@ -1246,7 +1282,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.geographyLabel}</span>
+                    {renderInfoLabel(t.geographyLabel, t.geographyHelp)}
                     <input
                       type="text"
                       value={assessmentForm.geography}
@@ -1256,7 +1292,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.useCaseTypeLabel}</span>
+                    {renderInfoLabel(t.useCaseTypeLabel, t.useCaseTypeHelp)}
                     <input
                       type="text"
                       value={assessmentForm.useCaseType}
@@ -1266,7 +1302,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.aiSystemCategoryLabel}</span>
+                    {renderInfoLabel(t.aiSystemCategoryLabel, t.aiSystemCategoryHelp)}
                     <input
                       type="text"
                       value={assessmentForm.aiSystemCategory}
@@ -1285,7 +1321,7 @@ export function CompliancePortal() {
 
                 <div className={styles.formGrid}>
                   <label className={styles.field}>
-                    <span>{t.systemNameLabel}</span>
+                    {renderInfoLabel(t.systemNameLabel, t.systemNameHelp)}
                     <input
                       type="text"
                       value={assessmentForm.systemName}
@@ -1295,7 +1331,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.systemVersionLabel}</span>
+                    {renderInfoLabel(t.systemVersionLabel, t.systemVersionHelp)}
                     <input
                       type="text"
                       value={assessmentForm.systemVersion}
@@ -1305,7 +1341,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.providerLabel}</span>
+                    {renderInfoLabel(t.providerLabel, t.providerHelp)}
                     <input
                       type="text"
                       value={assessmentForm.provider}
@@ -1315,7 +1351,7 @@ export function CompliancePortal() {
                   </label>
 
                   <label className={styles.field}>
-                    <span>{t.deploymentContextLabel}</span>
+                    {renderInfoLabel(t.deploymentContextLabel, t.deploymentContextHelp)}
                     <input
                       type="text"
                       value={assessmentForm.deploymentContext}
