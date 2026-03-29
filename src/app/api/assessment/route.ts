@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildSignedJsonHeaders, getComplianceApiBaseUrl } from "@/lib/upstream-signing";
+import { buildSignedJsonHeaders, getComplianceServiceBaseUrl } from "@/lib/upstream-signing";
 
 function buildAssistedAssessment(payload: Record<string, unknown>) {
   const now = new Date().toISOString();
@@ -45,7 +45,7 @@ function buildAssistedAssessment(payload: Record<string, unknown>) {
 export async function POST(request: Request) {
   const payload = (await request.json()) as Record<string, unknown>;
   const preferredLanguage = String(payload.preferredLanguage ?? "ES").toUpperCase();
-  const backendBaseUrl = getComplianceApiBaseUrl();
+  const backendBaseUrl = getComplianceServiceBaseUrl("assessment");
 
   if (backendBaseUrl) {
     const rawBody = JSON.stringify(payload);
