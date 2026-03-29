@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { buildSignedJsonHeaders, getComplianceApiBaseUrl } from "@/lib/upstream-signing";
+import { buildSignedJsonHeaders, getComplianceServiceBaseUrl } from "@/lib/upstream-signing";
 
 export async function POST(request: Request) {
   const payload = await request.json();
-  const backendBaseUrl = getComplianceApiBaseUrl();
+  const backendBaseUrl = getComplianceServiceBaseUrl("notification");
 
   if (!backendBaseUrl) {
     return NextResponse.json({ error: "Compliance backend URL is not configured." }, { status: 503 });

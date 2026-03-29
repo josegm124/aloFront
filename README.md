@@ -1,28 +1,37 @@
 # aloFront
 
-Frontend Next.js para desplegar en Vercel y conversar con `aloChat`.
+Frontend for the CertifAI MVP.
 
-## Variables de entorno
-Crear `.env.local` con:
+Safe branch for the local MVP flow:
+- `feature/RBSai`
+
+Do not push unfinished local-only changes to `master`, because `master` is tied to Vercel deployment.
+
+## Local run
 
 ```bash
-ALOCHAT_API_BASE_URL=https://tu-api-gateway.execute-api.us-east-1.amazonaws.com
-ALOCHAT_WEB_TENANT_ID=acme
-ALOCHAT_WEB_SIGNING_SECRET=reemplazar_con_hmac_real
+cd /home/jose-guerrero/Desktop/aloFront
+ALOCHAT_LOCAL_MODE=true npm run start -- --hostname 127.0.0.1 --port 3000
 ```
 
-## Flujo
-- el navegador habla con rutas internas de Next
-- Next firma el request con HMAC en el servidor
-- Next envia `POST /api/v1/inbound/web` al backend
-- luego hace polling de `GET /api/v1/web/messages/{messageId}`
+Open:
+- `http://127.0.0.1:3000`
 
-## Desarrollo
-```bash
-npm install
-npm run dev
-```
+## Local backend expectation
 
-## Rutas internas
-- `POST /api/chat`
-- `GET /api/chat/:messageId`
+The frontend local mode expects these backend services:
+- assessment: `http://localhost:8080`
+- document: `http://localhost:8082`
+- report: `http://localhost:8086`
+- notification: `http://localhost:8087`
+
+## Current local MVP flow
+
+The current local UI path supports:
+- create assessment
+- upload PDF
+- receive document analysis
+- generate final report
+- open the web report
+- download the PDF
+- generate a notification payload without real email

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildSignedFormHeaders, getComplianceApiBaseUrl } from "@/lib/upstream-signing";
+import { buildSignedFormHeaders, getComplianceServiceBaseUrl } from "@/lib/upstream-signing";
 
 function buildAssistedDocumentResponse(formData: FormData, fileName: string, preferredLanguage: string) {
   const assistedPreview = preferredLanguage === "EN" ? "Analysis ready for" : "Analisis listo para";
@@ -39,7 +39,7 @@ function buildAssistedDocumentResponse(formData: FormData, fileName: string, pre
 export async function POST(request: Request) {
   const formData = await request.formData();
   const preferredLanguage = String(formData.get("preferredLanguage") ?? "ES").toUpperCase();
-  const backendBaseUrl = getComplianceApiBaseUrl();
+  const backendBaseUrl = getComplianceServiceBaseUrl("document");
   const file = formData.get("file");
   const fileName = file instanceof File ? file.name : "document.pdf";
 
