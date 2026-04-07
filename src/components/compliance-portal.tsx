@@ -530,7 +530,7 @@ const defaultAssessmentForm: AssessmentFormState = {
   tenantId: "tenant-alo",
   organizationId: "org-alo",
   userId: "",
-  preferredLanguage: "ES",
+  preferredLanguage: "EN",
   sector: "HEALTHCARE",
   useCaseType: "",
   aiSystemCategory: "",
@@ -681,7 +681,7 @@ function renderInfoLabel(label: string, help: string) {
 }
 
 export function CompliancePortal() {
-  const [locale, setLocale] = useState<Locale>("es");
+  const [locale, setLocale] = useState<Locale>("en");
   const [activeView, setActiveView] = useState<View>("landing");
   const [loginForm, setLoginForm] = useState<LoginFormState>(defaultLoginForm);
   const [signupForm, setSignupForm] = useState<SignupFormState>(defaultSignupForm);
@@ -1011,14 +1011,20 @@ export function CompliancePortal() {
               <button
                 className={`${styles.localeButton} ${locale === "es" ? styles.localeButtonActive : ""}`}
                 type="button"
-                onClick={() => setLocale("es")}
+                onClick={() => {
+                  setLocale("es");
+                  setAssessmentForm((current) => ({ ...current, preferredLanguage: "ES" }));
+                }}
               >
                 {t.langEs}
               </button>
               <button
                 className={`${styles.localeButton} ${locale === "en" ? styles.localeButtonActive : ""}`}
                 type="button"
-                onClick={() => setLocale("en")}
+                onClick={() => {
+                  setLocale("en");
+                  setAssessmentForm((current) => ({ ...current, preferredLanguage: "EN" }));
+                }}
               >
                 {t.langEn}
               </button>
